@@ -2,6 +2,7 @@
 from geopy.geocoders import Nominatim
 import pandas as pd
 import csv
+from time import sleep
 
 addresses = []
 counts = []
@@ -38,9 +39,9 @@ def address_to_lat_long(addresses):
             print(curr_long)
             coordinates[0].append(curr_lat)
             coordinates[1].append(curr_long)
+            sleep(0.1)
         except AttributeError:
             print("Not an address.")
-
 
 
 print("Testing address_to_lat_long...")
