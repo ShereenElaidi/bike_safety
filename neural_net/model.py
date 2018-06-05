@@ -1,41 +1,48 @@
 # import statements
-import csv
 from geopy.geocoders import Nominatim
+import pandas as pd
+import csv
 
 addresses = []
 counts = []
-# loading the dataset
-with open('data.csv', 'rt') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    for row in csv_reader:
-        addresses.append(row[12])
-        counts.append(row[11])
 
+# loading the data set
+data_set = pd.read_csv("data.csv")
+
+# obtaining the duplicate count and geocoding address
+addresses = data_set['Geocoding address']
+counts = data_set['Duplicate count']
+print(addresses)
+print(counts)
 
 # a function to obtain the latitude and longitude of a given address.
 # Input: a string containing the address
 # Output: latitude, longitude of the address
 def find_coordinates(address):
     geolocator = Nominatim()
-    location = geolocator.geocode(address)
+    location = geolocator.geocode(address, timeout = 10)
     return location.latitude, location.longitude
 
-# DEBUGGING
-# address = "805 Sherbrooke St E, Montreal"
-# lat, long = find_coordinates(address)
-# print("Data for: " + address)
-# print('Latitude is: {:.5f}'.format(lat))
-# print('Longitude is: {:.5f}'.format(long))
-# a function to convert all the addresses to their lat and long
-# Input: a vector of string addresses (n*1)
-# Output: a matrix of lat and long (n*2)
 coordinates = []
-# converts all the addresses in an array to an array of lat
-# and long.
-def address_to_lat_long(addresses):
-    for string in addresses:
-        (coordinates[0], coordinates[1]).append(find_coordinates(string))
+coordinates.append([])
+coordinates.append([])
+print(data_set.head())
 
-# debugging
+
+def address_to_lat_long(addresses):
+    m = len(list(csv.reader(open('data.csv'))))
+    for i in range (0,m):
+        try:
+            curr_lat, curr_long = find_coordinates(addresses[i])
+            print(curr_lat)
+            print(curr_long)
+            coordinates[0].append(curr_lat)
+            coordinates[1].append(curr_long)
+        except AttributeError:
+            print("Not an address.")
+
+
+
+print("Testing address_to_lat_long...")
 address_to_lat_long(addresses)
 print(coordinates)
