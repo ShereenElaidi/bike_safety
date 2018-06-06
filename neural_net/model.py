@@ -2,7 +2,7 @@
 from geopy.geocoders import Nominatim
 import pandas as pd
 import csv
-from time import sleep
+import time
 
 addresses = []
 counts = []
@@ -32,18 +32,21 @@ print(data_set.head())
 
 def address_to_lat_long(addresses):
     m = len(list(csv.reader(open('data.csv'))))
+    data_base = open("data_base.txt", "w")
     for i in range (0,m):
         try:
             curr_lat, curr_long = find_coordinates(addresses[i])
-            print(curr_lat)
-            print(curr_long)
             coordinates[0].append(curr_lat)
             coordinates[1].append(curr_long)
-            sleep(0.1)
+            curr_entry = str(curr_lat) + " " + str(curr_long)
+            print(curr_entry)
+            data_base.write(curr_entry + "\n")
+            time.sleep(1)
         except AttributeError:
             print("Not an address.")
-
 
 print("Testing address_to_lat_long...")
 address_to_lat_long(addresses)
 print(coordinates)
+
+
