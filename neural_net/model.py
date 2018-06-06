@@ -7,13 +7,20 @@ import requests
 
 addresses = []
 counts = []
+date = []
+year = []
+data_time = []
 
 # loading the data set
 data_set = pd.read_csv("data.csv")
 
-# obtaining the duplicate count and geocoding address
 addresses = data_set['Geocoding address']
 counts = data_set['Duplicate count']
+date = data_set['Date']
+year = data_set['Year']
+data_time = data_set['Time']
+
+
 
 # a function to obtain the latitude and longitude of a given address.
 # Input: a string containing the address
@@ -26,7 +33,7 @@ def get_coordinates(address):
     location = results[0]['geometry']['location']
     lat = str(location['lat'])
     lng = str(location['lng'])
-    print(lat + " " + lng)
+    # print(lat + " " + lng)
     return lat, lng
 
 coordinates = []
@@ -40,24 +47,30 @@ coordinates.append([])
 def address_to_coordinates(addresses):
     m = len(list(csv.reader(open('data.csv'))))
     data_base = open("data_base.txt", "w")
+    header = "Year\tDate\tTime\tCount\tLat\t\tLng\n"
+    data_base.write(header)
+    print(header)
     for i in range (0,m):
         t0 = time.time()            # Take note of the initial time
         try:
             curr_lat, curr_long = get_coordinates(addresses[i])
             coordinates[0].append(curr_lat)
             coordinates[1].append(curr_long)
-            curr_entry = str(curr_lat) + " " + str(curr_long)
+            curr_entry = str(year[i]) + "\t" + str(date[i]) + "\t" + str(data_time[i]) + "\t" + str(counts[i]) + "\t" + \
+                         str(curr_lat) + "\t" + str(curr_long) + "\n"
             print(curr_entry)
-            data_base.write(curr_entry + "\n")
+            data_base.write(curr_entry)
             time.sleep(2)
         except AttributeError:
             print("Not an address.")
         except IndexError:
-            data_base.write("NaN")
+            data_base.write("NaN" + "\n")
+            print("NaN")
 
         tf = time.time()            # Take note of the final time
 
         if i%100==0:
+            print('Iteration: {}'.format(i))
             print('Time {} s'.format(tf - t0))
 
 print("TESTING ADDRESS TO COOORDINATES FUNCTION")
