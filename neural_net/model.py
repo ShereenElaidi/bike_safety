@@ -73,9 +73,7 @@ def address_to_coordinates(addresses):
             print('Iteration: {}'.format(i))
             print('Time {} s'.format(tf - t0))
 
-print("TESTING ADDRESS TO COOORDINATES FUNCTION")
-print("Converting data...")
-address_to_coordinates(addresses)
+
 
 
 # lat = []
