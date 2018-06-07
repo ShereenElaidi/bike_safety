@@ -4,7 +4,7 @@ import random
 
 ifile = open(sys.argv[1], 'rt')
 reader = csv.reader(ifile)
-ofile  = open('ttest.csv', "wt")
+ofile  = open('data_base_converted.csv', "wt")
 writer = csv.writer(ofile, delimiter=',')
 
 rand = ['RUSH HOUR', 'AM', 'PM']
