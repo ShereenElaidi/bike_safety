@@ -21,7 +21,7 @@ for row in reader:
     elif (int(row[1].split('/')[0]) >= 6 and int(row[1].split('/')[0]) <= 8):
         row[1] == 'SUMMER'
     elif(int(row[1].split('/')[0]) >= 9 and int(row[1].split('/')[0]) <= 11):
-        row[1] == 'SUMMER'
+        row[1] == 'FALL'
 
     writer.writerow(row)
 
