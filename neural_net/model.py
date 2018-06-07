@@ -8,7 +8,7 @@ import pandas as pd
 import torch.utils.data
 
 # load the data
-df = pd.read_csv("converted_data.csv")
+df = pd.read_csv("data.csv")
 
 # shuffling the dataframe
 
