@@ -26,7 +26,7 @@ data_time = data_set['Time']
 # Input: a string containing the address
 # Output: latitude, longitude of the address
 def get_coordinates(address):
-    url = 'https://maps.googleapis.com/maps/api/geocode/json'
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?key=[API_KEY_HERE]'    #API key removed for privacy reasons
     params = {'sensor': 'false', 'address': address}
     r = requests.get(url, params=params)
     results = r.json()['results']
