@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import numpy as np
 import pandas as pd
 import torch.utils.data
+from random import randint
 
 # load the data
 df = pd.read_csv("data.csv")
@@ -50,17 +51,45 @@ class model(nn.Module):
 
         return out
 
-
-print(train['Lat'])
 print(df.head())
 
-# TODO convert the data to int format: loop through the list of lists, converting each string to int
-# TODO convert  AM, PM, RH to 1,2,3. NaN ==> randomly
-# TODO convert remove NaN's from the count dataset
+print(df['Count'].max())
 
-# train_data = torch.utils.data.TensorDataset(torch.from_numpy(x_train).float(),
-#                                             torch.from_numpy(y_train).long())
-# val_data = torch.utils.data.TensorDataset(torch.from_numpy(x_val).float(),
-#                                           torch.from_numpy(y_val).long())
-# test_data = torch.utils.data.TensorDataset(torch.from_numpy(x_test).float(),
-#                                            torch.from_numpy(y_test).long())
+# def safe_convert(x, max_val):
+#   try:
+#     new_x = int(x)
+#     return new_x
+#   except ValueError:
+#     return randint(0, max_val)
+#
+# max_val_dict = {'Month': 11, 'Day': 30, ...}
+#
+# new_df = {}
+# for key in df.keys():
+#   df[key] = [safe_convert(x, max_val_dict[key]) for x in df[key]]
+# converting the list from string to int
+
+for i in range(0, 3741):
+    print(i)
+    df['Year'][i] = int(df["Year"][i])
+    df['Month'][i] = int(df["Month"][i])
+    df['Time'][i] = int(df["Time"][i])
+    try:
+        df['Count'][i] = int(df['Count'][i])
+    except ValueError:
+        df['Count'][i] = randint(0,df['Count'].max())
+    df['Lat'][i] = int(df["Lat"][i])
+    df['Lng'][i] = int(df["Lng"][i])
+
+
+
+
+# TODO convert the data to int format: loop through the list of lists, converting each string to int
+
+
+train_data = torch.utils.data.TensorDataset(torch.from_numpy(x_train).float(),
+                                            torch.from_numpy(y_train).long())
+val_data = torch.utils.data.TensorDataset(torch.from_numpy(x_val).float(),
+                                          torch.from_numpy(y_val).long())
+test_data = torch.utils.data.TensorDataset(torch.from_numpy(x_test).float(),
+                                           torch.from_numpy(y_test).long())
