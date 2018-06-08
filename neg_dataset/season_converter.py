@@ -14,6 +14,5 @@ for row in reader:
 	row[1] = row[1].split('/')[0] 
 	writer.writerow(row)
 
-
 ifile.close()
 ofile.close()

@@ -51,12 +51,16 @@ class model(nn.Module):
         return out
 
 
+print(train['Lat'])
+print(df.head())
 
-# TODO turn data into numerical: AM - 1, PM - 2, RH - 3; 4 SEASONS: Winter - 1,
-# TODO Spring  - 2, Summer - 3, Fall - 4
-train_data = torch.utils.data.TensorDataset(torch.from_numpy(x_train).float(),
-                                            torch.from_numpy(y_train).long())
-val_data = torch.utils.data.TensorDataset(torch.from_numpy(x_val).float(),
-                                          torch.from_numpy(y_val).long())
-test_data = torch.utils.data.TensorDataset(torch.from_numpy(x_test).float(),
-                                           torch.from_numpy(y_test).long())
+# TODO convert the data to int format: loop through the list of lists, converting each string to int
+# TODO convert  AM, PM, RH to 1,2,3. NaN ==> randomly
+# TODO convert remove NaN's from the count dataset
+
+# train_data = torch.utils.data.TensorDataset(torch.from_numpy(x_train).float(),
+#                                             torch.from_numpy(y_train).long())
+# val_data = torch.utils.data.TensorDataset(torch.from_numpy(x_val).float(),
+#                                           torch.from_numpy(y_val).long())
+# test_data = torch.utils.data.TensorDataset(torch.from_numpy(x_test).float(),
+#                                            torch.from_numpy(y_test).long())
