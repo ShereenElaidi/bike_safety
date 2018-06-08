@@ -114,4 +114,4 @@ print(model())
 neural_net = neural_net.eval()
 data, target = val_data[0:5]
 output = neural_net(data)
-print(out)
+print(output)
