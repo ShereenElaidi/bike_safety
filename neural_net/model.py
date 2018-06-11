@@ -45,15 +45,19 @@ class model(nn.Module):
         self.fc1 = nn.Linear(5, 20)
         self.fc2 = nn.Linear(20, 40)
         self.fc3 = nn.Linear(40, 40)
-        self.fc4 = nn.Linear(40, 20)
-        self.fc5 = nn.Linear(20, 11)         # Final output: predicing # of possible accidents
+        self.fc4 = nn.Linear(40, 80)
+        self.fc5 = nn.Linear(80, 40)
+        self.fc6 = nn.Linear(40, 20)
+        self.fc7 = nn.Linear(20, 11)         # Final output: predicing # of possible accidents
 
     def forward(self, x):
         out = F.relu(self.fc1(x))
         out = F.relu(self.fc2(out))
         out = F.relu(self.fc3(out))
         out = F.relu(self.fc4(out))
-        out = self.fc5(out)
+        out = F.relu(self.fc5(out))
+        out = F.relu(self.fc6(out))
+        out = self.fc7(out)
 
         return out
 
@@ -191,7 +195,7 @@ def load_model(epoch, model, path='./'):
     return model
 
 # nb epochs
-numEpochs = 300
+numEpochs = 100
 checkpoint_freq = 10
 path='./'
 train_losses = []
@@ -217,4 +221,29 @@ neural_net = neural_net.eval()
 data, target = val_data[0:5]
 output = neural_net(data)
 # output_prob = F.softmax(output, dim=1)  REMOVE
-print(output_prob)
+# print(output_prob)
+
+# Plotting the learning curve
+x = list(range(len(train_losses)))
+
+ax = plt.subplot(111)
+plt.plot(x, train_losses, 'r', label="Train")
+plt.plot(x, val_losses, 'g', label="Validation")
+plt.title('Loss')
+leg = plt.legend(loc='best', ncol=2, mode="expand", shadow=True, fancybox=True)
+leg.get_frame().set_alpha(0.99)
+plt.show()
+
+x = list(range(len(train_accuracies)))
+
+ax = plt.subplot(111)
+plt.plot(x, train_accuracies, 'r', label="Train")
+plt.plot(x, val_accuracies, 'g', label="Validation")
+plt.title('Accuracy')
+leg = plt.legend(loc='best', ncol=2, mode="expand", shadow=False, fancybox=False)
+leg.get_frame().set_alpha(0.99)
+plt.show()
+
+test_loss, test_acc = eval(neural_net, test_loader)
+
+exit()
