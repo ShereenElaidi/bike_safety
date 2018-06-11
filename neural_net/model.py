@@ -146,6 +146,8 @@ def train(epoch, model, train_loader, optimizer):
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
         prediction = model(data)
+        print(target.size())
+        print(prediction.size())
         loss = cost_function(prediction, target)
         loss.backward()
         optimizer.step()
@@ -216,10 +218,9 @@ for epoch in range(1, numEpochs+1):
 save_model(numEpochs, neural_net, path)
 print("\n\n\nOptimization ended.\n")
 
-
 # testing the trained model out
 neural_net = model.eval()
 data, target = val_data[0:5]
 output = neural_net(data)
-output_prob = F.softmax(output, dim=1)
+# output_prob = F.softmax(output, dim=1)  REMOVE
 print(output_prob)
