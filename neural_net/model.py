@@ -11,7 +11,11 @@ from random import randint
 import pickle
 
 # load the data
+
 df = pd.read_csv("data.csv")
+
+pd.DataFrame.hist(df, ['Count'], bins=25)
+plt.show()
 
 # shuffling the dataframe
 
@@ -112,6 +116,10 @@ print(model())
 # setting the neural net in .eval() mode:
 
 neural_net = neural_net.eval()
-data, target = val_data[0:5]
+data, target = val_data[0:1]
 output = neural_net(data)
 print(output)
+output_prob = F.softmax(output,dim=1)
+print("Output probabilities")
+print(output_prob)
+
