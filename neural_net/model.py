@@ -46,7 +46,7 @@ class model(nn.Module):
         self.fc2 = nn.Linear(20, 40)
         self.fc3 = nn.Linear(40, 40)
         self.fc4 = nn.Linear(40, 20)
-        self.fc5 = nn.Linear(20, 10)         # Final output: predicing # of possible accidents
+        self.fc5 = nn.Linear(20, 11)         # Final output: predicing # of possible accidents
 
     def forward(self, x):
         out = F.relu(self.fc1(x))
@@ -57,9 +57,9 @@ class model(nn.Module):
 
         return out
 
-print(df.head())
-
-print(df['Count'].max())
+# print(df.head())
+#
+# print(df['Count'].max())
 
 # def safe_convert(x, max_val):
 #   try:
@@ -94,13 +94,6 @@ with open('dictionary.pickle', 'wb') as handle:
 with open('dictionary.pickle', 'rb') as handle:
     data = pickle.load(handle)
 
-# pickle.dump(df, 'df.pickle')
-# df = pickle.load('df.pickle')
-
-
-# TODO convert the data to int format: loop through the list of lists, converting each string to int
-
-
 train_data = torch.utils.data.TensorDataset(torch.from_numpy(x_train).float(),
                                             torch.from_numpy(y_train).long())
 val_data = torch.utils.data.TensorDataset(torch.from_numpy(x_val).float(),
@@ -111,17 +104,17 @@ test_data = torch.utils.data.TensorDataset(torch.from_numpy(x_test).float(),
 # defining the model
 
 neural_net = model()
-print(model())
+# print(model())
 
 # setting the neural net in .eval() mode:
 
 neural_net = neural_net.eval()
 data, target = val_data[0:1]
 output = neural_net(data)
-print(output)
+# print(output)
 output_prob = F.softmax(output,dim=1)
-print("Output probabilities")
-print(output_prob)
+# print("Output probabilities")
+# print(output_prob)
 
 # loss function
 def cost_function(prediction, target):
@@ -146,12 +139,13 @@ def train(epoch, model, train_loader, optimizer):
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
         prediction = model(data)
-        print(target.size())
-        print(prediction.size())
+        # print(prediction)
         loss = cost_function(prediction, target)
         loss.backward()
         optimizer.step()
-        total_loss += loss.data[0]*len(data)
+        # print(loss.data.item())
+        # print(len(data))
+        total_loss += loss.data.item()*len(data)
         pred_classes = prediction.data.max(1,keepdim=True)[1]
         correct += pred_classes.eq(target.data.view_as(pred_classes)).sum().double()
 
@@ -219,7 +213,7 @@ save_model(numEpochs, neural_net, path)
 print("\n\n\nOptimization ended.\n")
 
 # testing the trained model out
-neural_net = model.eval()
+neural_net = neural_net.eval()
 data, target = val_data[0:5]
 output = neural_net(data)
 # output_prob = F.softmax(output, dim=1)  REMOVE
