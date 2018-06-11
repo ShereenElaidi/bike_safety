@@ -14,8 +14,8 @@ import pickle
 
 df = pd.read_csv("data.csv")
 
-pd.DataFrame.hist(df, ['Count'], bins=25)
-plt.show()
+# pd.DataFrame.hist(df, ['Count'], bins=25)
+# plt.show()
 
 # shuffling the dataframe
 
@@ -123,3 +123,103 @@ output_prob = F.softmax(output,dim=1)
 print("Output probabilities")
 print(output_prob)
 
+# loss function
+def cost_function(prediction, target):
+    loss = F.cross_entropy(prediction, target)
+    return loss
+
+# optimizer
+optimizer = optim.Adam(neural_net.parameters(), lr=0.001)
+train_batch_size = 32
+eval_batch_size = 32
+train_loader = torch.utils.data.DataLoader(train_data, batch_size = train_batch_size, shuffle =True)
+val_loader = torch.utils.data.DataLoader(val_data, batch_size = eval_batch_size, shuffle = False)
+test_loader = torch.utils.data.DataLoader(test_data, batch_size = eval_batch_size, shuffle=False)
+
+# training function
+def train(epoch, model, train_loader, optimizer):
+    # setting the model in .train() mode
+    model.train()
+    total_loss = 0
+    correct=0
+
+    for batch_idx, (data, target) in enumerate(train_loader):
+        optimizer.zero_grad()
+        prediction = model(data)
+        loss = cost_function(prediction, target)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.data[0]*len(data)
+        pred_classes = prediction.data.max(1,keepdim=True)[1]
+        correct += pred_classes.eq(target.data.view_as(pred_classes)).sum().double()
+
+    # compute mean loss
+    mean_loss = total_loss/len(train_loader.dataset)
+    acc = correct/len(train_loader.dataset)
+    print('Train Epoch: {}   Avg_Loss: {:.5f}   Acc: {}/{} ({:.3f}%)'.format(
+        epoch, mean_loss, correct, len(train_loader.dataset),
+        100. * acc))
+    return mean_loss, acc
+
+# evaluation function
+
+def eval(model, eval_loader):
+    model.eval()
+    total_loss = 0
+    correct = 0
+
+    for batch_fix, (data,target) in enumerate(eval_loader):
+        prediction = model(data)
+        loss = cost_function(prediction, target)
+        total_loss += loss.data[0]*len(data)
+        pred_classes = prediction.data.max(1,keepdim=True)[1]
+        correct += pred_classes.eq(target.data.view_as(pred_classes)).sum().double()
+
+    # compute mean loss
+    mean_loss = total_loss/len(eval_loader.dataset)
+    acc = correct/len(eval_loader.dataset)
+    print('Eval:  Avg_Loss: {:.5f}   Acc: {}/{} ({:.3f}%)'.format(
+        mean_loss, correct, len(eval_loader.dataset),
+        100. * acc))
+    return mean_loss, acc
+
+# save the model
+def save_model(epoch, model, path='./'):
+    filename = path+'neural_network_{}.pt'.format(epoch)
+    torch.save(model.state_dict(), filename)
+    return model
+
+def load_model(epoch, model, path='./'):
+    filename = path + 'neural_network_{].pt'.format(epoch)
+    model.load_state_dict(torch.load(filename))
+    return model
+
+# nb epochs
+numEpochs = 300
+checkpoint_freq = 10
+path='./'
+train_losses = []
+val_losses = []
+train_accuracies = []
+val_accuracies = []
+
+for epoch in range(1, numEpochs+1):
+    train_loss, train_acc = train(epoch, neural_net, train_loader, optimizer)
+    val_loss, val_acc = eval(neural_net, val_loader)
+    train_losses.append(train_loss)
+    val_losses.append(val_loss)
+    train_accuracies.append(train_acc)
+    val_accuracies.append(val_acc)
+    if epoch % checkpoint_freq == 0:
+        save_model(epoch, neural_net, path)
+
+save_model(numEpochs, neural_net, path)
+print("\n\n\nOptimization ended.\n")
+
+
+# testing the trained model out
+neural_net = model.eval()
+data, target = val_data[0:5]
+output = neural_net(data)
+output_prob = F.softmax(output, dim=1)
+print(output_prob)
