@@ -1,27 +1,22 @@
 import matplotlib.pyplot as plt
 import torch
-from torch.autograd import Variable
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
 import pandas as pd
 import torch.utils.data
-from random import randint
 import pickle
 import os
 
 path = os.getcwd()
-
 # load the data
-
 df = pd.read_csv("data.csv")
 
 # pd.DataFrame.hist(df, ['Count'], bins=25)
 # plt.show()
 
 # shuffling the dataframe
-
 df = df.sample(frac=1)
 
 # Generating the training and validation sets
@@ -53,7 +48,6 @@ class model(nn.Module):
         self.fc6 = nn.Linear(40, 20)
         self.fc7 = nn.Linear(20, 11)         # Final output: predicing # of possible accidents
 
-
     def forward(self, x):
         out = F.relu(self.fc1(x))
         out = F.dropout(out, p=0.5)
@@ -68,28 +62,10 @@ class model(nn.Module):
         out = F.relu(self.fc6(out))
         out = F.dropout(out, p=0.5)
         out = self.fc7(out)
-
-
         return out
 
-# print(df.head())
-#
-# print(df['Count'].max())
 
-# def safe_convert(x, max_val):
-#   try:
-#     new_x = int(x)
-#     return new_x
-#   except ValueError:
-#     return randint(0, max_val)
-#
-# max_val_dict = {'Month': 11, 'Day': 30, ...}
-#
-# new_df = {}
-# for key in df.keys():
-#   df[key] = [safe_convert(x, max_val_dict[key]) for x in df[key]]
-# converting the list from string to int
-
+# UNCOMMENT THIS CODE WHENEVER YOU CHANGE THE DATA
 # for i in range(0, 3741):
 #     print(i)
 #     df['Year'][i] = int(df["Year"][i])
@@ -117,19 +93,13 @@ test_data = torch.utils.data.TensorDataset(torch.from_numpy(x_test).float(),
                                            torch.from_numpy(y_test).long())
 
 # defining the model
-
 neural_net = model()
-# print(model())
 
 # setting the neural net in .eval() mode:
-
 neural_net = neural_net.eval()
 data, target = val_data[0:1]
 output = neural_net(data)
-# print(output)
 output_prob = F.softmax(output,dim=1)
-# print("Output probabilities")
-# print(output_prob)
 
 # loss function
 def cost_function(prediction, target):
@@ -155,23 +125,19 @@ def train(epoch, model, train_loader, optimizer):
     acc_optimal = 0
     loss_train = np.empty([numEpochs])
     loss_valid = np.empty([numEpochs])
-    error_train = np.empty([numEpochs])
-    error_valid = np.empty([numEpochs])
     acc_train = np.empty([numEpochs])
     acc_valid = np.empty([numEpochs])
 
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
         prediction = model(data)
-        # print(prediction)
         loss = cost_function(prediction, target)
         loss.backward()
         optimizer.step()
-        # print(loss.data.item())
-        # print(len(data))
         total_loss += loss.data.item()*len(data)
         pred_classes = prediction.data.max(1,keepdim=True)[1]
         correct += pred_classes.eq(target.data.view_as(pred_classes)).sum().double()
+
         # saving the best model
         model.eval()
         loss_train[epoch-1], acc_train[epoch-1] = eval(model, train_loader)
@@ -180,6 +146,7 @@ def train(epoch, model, train_loader, optimizer):
             acc_optimal = acc_valid[epoch-1]
             epoch_optimal = epoch
             torch.save(model.state_dict, path+'/Model_optimal.pth')
+
     # compute mean loss
     mean_loss = total_loss/len(train_loader.dataset)
     acc = correct/len(train_loader.dataset)
@@ -189,7 +156,6 @@ def train(epoch, model, train_loader, optimizer):
     return mean_loss, acc
 
 # evaluation function
-
 def eval(model, eval_loader):
     model.eval()
     total_loss = 0
@@ -216,12 +182,12 @@ def save_model(epoch, model, path='./'):
     torch.save(model.state_dict(), filename)
     return model
 
+# load the model
 def load_model(epoch, model, path='./'):
     filename = path + 'neural_network_{].pt'.format(epoch)
     model.load_state_dict(torch.load(filename))
     return model
 
-# nb epochs
 numEpochs = 50
 checkpoint_freq = 10
 path='./'
@@ -229,7 +195,6 @@ train_losses = []
 val_losses = []
 train_accuracies = []
 val_accuracies = []
-
 
 for epoch in range(1, numEpochs+1):
     train_loss, train_acc = train(epoch, neural_net, train_loader, optimizer)
@@ -241,21 +206,18 @@ for epoch in range(1, numEpochs+1):
     if epoch % checkpoint_freq == 0:
         save_model(epoch, neural_net, path)
 
-
-
+# Saving the model
 save_model(numEpochs, neural_net, path)
-print("\n\n\nOptimization ended.\n")
+print("\n\n\nOptimization ended. Done!\n")
 
 # testing the trained model out
 neural_net = neural_net.eval()
 data, target = val_data[0:5]
 output = neural_net(data)
-# output_prob = F.softmax(output, dim=1)  REMOVE
-# print(output_prob)
 test_loss, test_acc = eval(neural_net, test_loader)
+
 # Plotting the learning curve
 x = list(range(len(train_losses)))
-
 ax = plt.subplot(111)
 plt.plot(x, train_losses, 'r', label="Train")
 plt.plot(x, val_losses, 'g', label="Validation")
@@ -264,8 +226,8 @@ leg = plt.legend(loc='best', ncol=2, mode="expand", shadow=True, fancybox=True)
 leg.get_frame().set_alpha(0.99)
 plt.show()
 
+# Plotting the accuracy curve
 x = list(range(len(train_accuracies)))
-
 ax = plt.subplot(111)
 plt.plot(x, train_accuracies, 'r', label="Train")
 plt.plot(x, val_accuracies, 'g', label="Validation")
@@ -273,6 +235,4 @@ plt.title('Accuracy')
 leg = plt.legend(loc='best', ncol=2, mode="expand", shadow=False, fancybox=False)
 leg.get_frame().set_alpha(0.99)
 plt.show()
-
-
 exit()
