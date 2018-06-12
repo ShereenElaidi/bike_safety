@@ -9,6 +9,9 @@ import pandas as pd
 import torch.utils.data
 from random import randint
 import pickle
+import os
+
+path = os.getcwd()
 
 # load the data
 
@@ -50,14 +53,22 @@ class model(nn.Module):
         self.fc6 = nn.Linear(40, 20)
         self.fc7 = nn.Linear(20, 11)         # Final output: predicing # of possible accidents
 
+
     def forward(self, x):
         out = F.relu(self.fc1(x))
+        out = F.dropout(out, p=0.5)
         out = F.relu(self.fc2(out))
+        out = F.dropout(out, p=0.5)
         out = F.relu(self.fc3(out))
+        out = F.dropout(out, p=0.5)
         out = F.relu(self.fc4(out))
+        out = F.dropout(out, p=0.5)
         out = F.relu(self.fc5(out))
+        out = F.dropout(out, p=0.5)
         out = F.relu(self.fc6(out))
+        out = F.dropout(out, p=0.5)
         out = self.fc7(out)
+
 
         return out
 
@@ -126,7 +137,7 @@ def cost_function(prediction, target):
     return loss
 
 # optimizer
-optimizer = optim.Adam(neural_net.parameters(), lr=0.001)
+optimizer = optim.Adam(neural_net.parameters(), lr=0.0001)
 train_batch_size = 32
 eval_batch_size = 32
 train_loader = torch.utils.data.DataLoader(train_data, batch_size = train_batch_size, shuffle =True)
@@ -140,6 +151,15 @@ def train(epoch, model, train_loader, optimizer):
     total_loss = 0
     correct=0
 
+    # to save the best model regardless of when in the training it occured
+    acc_optimal = 0
+    loss_train = np.empty([numEpochs])
+    loss_valid = np.empty([numEpochs])
+    error_train = np.empty([numEpochs])
+    error_valid = np.empty([numEpochs])
+    acc_train = np.empty([numEpochs])
+    acc_valid = np.empty([numEpochs])
+
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
         prediction = model(data)
@@ -152,7 +172,14 @@ def train(epoch, model, train_loader, optimizer):
         total_loss += loss.data.item()*len(data)
         pred_classes = prediction.data.max(1,keepdim=True)[1]
         correct += pred_classes.eq(target.data.view_as(pred_classes)).sum().double()
-
+        # saving the best model
+        model.eval()
+        loss_train[epoch-1], acc_train[epoch-1] = eval(model, train_loader)
+        loss_valid[epoch-1], acc_valid[epoch-1] = eval(model, val_loader)
+        if (acc_valid[epoch-1] >acc_optimal):
+            acc_optimal = acc_valid[epoch-1]
+            epoch_optimal = epoch
+            torch.save(model.state_dict, path+'/Model_optimal.pth')
     # compute mean loss
     mean_loss = total_loss/len(train_loader.dataset)
     acc = correct/len(train_loader.dataset)
@@ -168,7 +195,7 @@ def eval(model, eval_loader):
     total_loss = 0
     correct = 0
 
-    for batch_fix, (data,target) in enumerate(eval_loader):
+    for batch_fix, (data, target) in enumerate(eval_loader):
         prediction = model(data)
         loss = cost_function(prediction, target)
         total_loss += loss.data[0]*len(data)
@@ -195,13 +222,14 @@ def load_model(epoch, model, path='./'):
     return model
 
 # nb epochs
-numEpochs = 100
+numEpochs = 50
 checkpoint_freq = 10
 path='./'
 train_losses = []
 val_losses = []
 train_accuracies = []
 val_accuracies = []
+
 
 for epoch in range(1, numEpochs+1):
     train_loss, train_acc = train(epoch, neural_net, train_loader, optimizer)
@@ -213,6 +241,8 @@ for epoch in range(1, numEpochs+1):
     if epoch % checkpoint_freq == 0:
         save_model(epoch, neural_net, path)
 
+
+
 save_model(numEpochs, neural_net, path)
 print("\n\n\nOptimization ended.\n")
 
@@ -222,7 +252,7 @@ data, target = val_data[0:5]
 output = neural_net(data)
 # output_prob = F.softmax(output, dim=1)  REMOVE
 # print(output_prob)
-
+test_loss, test_acc = eval(neural_net, test_loader)
 # Plotting the learning curve
 x = list(range(len(train_losses)))
 
@@ -244,6 +274,5 @@ leg = plt.legend(loc='best', ncol=2, mode="expand", shadow=False, fancybox=False
 leg.get_frame().set_alpha(0.99)
 plt.show()
 
-test_loss, test_acc = eval(neural_net, test_loader)
 
 exit()
