@@ -145,7 +145,7 @@ def train(epoch, model, train_loader, optimizer):
         if (acc_valid[epoch-1] >acc_optimal):
             acc_optimal = acc_valid[epoch-1]
             epoch_optimal = epoch
-            torch.save(model.state_dict, path+'/Model_optimal.pth')
+            torch.save(model.state_dict(), path+'/Model_optimal.pth')
 
     # compute mean loss
     mean_loss = total_loss/len(train_loader.dataset)
