@@ -8,6 +8,8 @@ import pandas as pd
 import torch.utils.data
 import pickle
 import os
+import torchvision.transforms as transforms
+
 
 path = os.getcwd()
 # load the data
@@ -85,13 +87,27 @@ with open('dictionary.pickle', 'wb') as handle:
 with open('dictionary.pickle', 'rb') as handle:
     data = pickle.load(handle)
 
-train_data = torch.utils.data.TensorDataset(torch.from_numpy(x_train).float(),
+# Compute the mean of each column of the tensors. Also compute the standard deviation
+# torch.mean[data, axis  =  1] data-mean/stdv
+
+# def normalize(tensor_data):
+#     mean, var = tf.nn.moments(tensor_data, [1], keep_dims=True)
+#     new_tensor = tf.div(tf.subtract(tensor_data, mean), tf.sqrt(var))
+#     return new_tensor
+
+train_data = torch.utils.data.TensorDataset(normalize(torch.from_numpy(x_train).float()),
                                             torch.from_numpy(y_train).long())
-val_data = torch.utils.data.TensorDataset(torch.from_numpy(x_val).float(),
+val_data = torch.utils.data.TensorDataset(normalize(torch.from_numpy(x_val).float()),
                                           torch.from_numpy(y_val).long())
-test_data = torch.utils.data.TensorDataset(torch.from_numpy(x_test).float(),
+test_data = torch.utils.data.TensorDataset(normalize(torch.from_numpy(x_test).float()),
                                            torch.from_numpy(y_test).long())
 
+
+
+# normalize the data
+# train_data = normalize(train_data)
+# val_data = normalize(val_data)
+# test_data = normalize(test_data)
 # defining the model
 neural_net = model()
 
