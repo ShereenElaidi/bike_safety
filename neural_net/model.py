@@ -93,12 +93,8 @@ with open('dictionary.pickle', 'rb') as handle:
 def normalize(tensor_data):
     mean = tensor_data.mean()
     std = tensor_data.std()
-
     return (tensor_data - mean)/std
 
-    #
-    # new_tensor = transforms.Normalize(mean= mean, std=std)
-    # return new_tensor
 
 train_data = torch.utils.data.TensorDataset(normalize(torch.from_numpy(x_train).float()),
                                             torch.from_numpy(y_train).long())
