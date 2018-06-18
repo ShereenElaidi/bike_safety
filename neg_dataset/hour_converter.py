@@ -14,7 +14,7 @@ rand = ['RUSH HOUR', 'AM', 'PM']
 # PM = 3
 rand_2 = [1,2,3]
 for row in reader:
-	#print(row[2].split(':')[0])
+	#print(row[2].split(':cq')[0])
 	if row[2].split(':')[0]>='12' and row[2].split(':')[0]<='15': 
 		row[2] = 'PM'
 		row[2] = 3
