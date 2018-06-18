@@ -8,7 +8,7 @@ import pandas as pd
 import torch.utils.data
 import pickle
 import os
-import torchvision.transforms as transforms
+from torchvision import transforms, datasets
 
 
 path = os.getcwd()
@@ -90,10 +90,15 @@ with open('dictionary.pickle', 'rb') as handle:
 # Compute the mean of each column of the tensors. Also compute the standard deviation
 # torch.mean[data, axis  =  1] data-mean/stdv
 
-# def normalize(tensor_data):
-#     mean, var = tf.nn.moments(tensor_data, [1], keep_dims=True)
-#     new_tensor = tf.div(tf.subtract(tensor_data, mean), tf.sqrt(var))
-#     return new_tensor
+def normalize(tensor_data):
+    mean = tensor_data.mean()
+    std = tensor_data.std()
+
+    return (tensor_data - mean)/std
+
+    #
+    # new_tensor = transforms.Normalize(mean= mean, std=std)
+    # return new_tensor
 
 train_data = torch.utils.data.TensorDataset(normalize(torch.from_numpy(x_train).float()),
                                             torch.from_numpy(y_train).long())
