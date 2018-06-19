@@ -1,9 +1,34 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <meta charset="utf-8">
     <title>Heatmaps</title>
     <style>
+    body {background-color = navyblue;}
+    h1 {
+    color: blue;
+    font-family: 'Roboto', sans-serif;;
+    font-size: 300%;
+    text-align: center;
+    background-color = powderblue;
+    }
+    h2 {
+    color: navy;
+    font-family: 'Roboto', sans-serif;;
+    font-size: 200%;
+    text-align: left;
+    background-color = powderblue;
+    padding-right: 30px;
+    padding-left: 80px;
+    }
+    p  {
+    color: black;
+    font-family: 'Roboto', sans-serif;;
+    font-size: 100%;
+    padding-right: 30px;
+    padding-left: 80px;
+    }   
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
@@ -16,52 +41,58 @@
         padding: 0;
       }
       #floating-panel {
-        position: absolute;
-        top: 10px;
+        /*position: absolute;*/
+        top: 11px;
         left: 25%;
         z-index: 5;
-        background-color: #fff;
+        background-color: #86CADD;
         padding: 5px;
         border: 1px solid #999;
         text-align: center;
         font-family: 'Roboto','sans-serif';
         line-height: 30px;
         padding-left: 10px;
+        draggable: {
+          direction: 'both',
+          initialOffset: {
+            x: 100,
+            y: 100
+        }; 
+    
       }
       #floating-panel {
-        background-color: #fff;
+        background-color: #86CADD;
         border: 1px solid #999;
         left: 25%;
         padding: 5px;
         position: absolute;
-        top: 10px;
+        top: 20px;
         z-index: 5;
       }
     </style>
   </head>
-
   <body>
-    <div id="floating-panel">
+    <!-- <div id="floating-panel">
       <button onclick="toggleHeatmap()">Toggle Heatmap</button>
       <button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
       <button onclick="changeOpacity()">Change opacity</button>
       <button onclick="changeDissipating()">Change dissipating</button>
-    </div>
+    </div> -->
+    <h1> AI<font color = "red">4</font>Good Final Project</h1>
+    <p>Hi! The aim of our project was to create an app to help reduce cycling accidents in Montréal. The app uses machine learning to predict the location(s), time(s) of day, and time(s) of year a cycler is likely to get into an accident, and warns them ahead of time so that they're using extra caution in the area.  </p>
+    <h2> Team Members</h2>
+    <p>  Merna Ghaffar, Yutong Yan, Shereen Elaidi </p>
+    <h2> Data Visualization </h2>
+    <p> This heat map shows the locations where a cyclist is the most likely to get into an accident. TODO: connect the heatmap to the model. It is based on the output of our machine leaning algorithm. [TODO: discuss in particular the architecture of the model]. If you scroll down, you can see the heatmap at various different times of the day (AM, PM, or rush hour) and at various different seasons.</p>
     <div id="map"></div>
     <script>
-
-      // This example requires the Visualization library. Include the libraries=visualization
-      // parameter when you first load the API. For example:
-      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
-
       var map, heatmap;
-
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 20,
+          zoom: 11,
           // 45.51675 -73.64918
-          center: {lat: 45.565230, lng: -73.522941},
+          center: {lat: 45.51675, lng: -73.64918},
           mapTypeId: 'satellite'
         });
 
