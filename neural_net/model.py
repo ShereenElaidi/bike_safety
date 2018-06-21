@@ -8,7 +8,6 @@ import pandas as pd
 import torch.utils.data
 import pickle
 import os
-from torchvision import transforms, datasets
 
 
 path = os.getcwd()
@@ -22,19 +21,19 @@ df = pd.read_csv("data.csv")
 df = df.sample(frac=1)
 
 # Generating the training and validation sets
-np.random.seed(1234)
-train, validate, test = np.split(df.sample(frac=1, random_state=134),
-                                 [int(.6*len(df)), int(.8*len(df))])
-
-# We need to drop the count values for the training, validation, and test
-x_train = train.drop(['Count'], axis =1).values
-y_train = train['Count'].values
-
-x_val = train.drop(['Count'], axis=1).values
-y_val = train['Count'].values
-
-x_test = test.drop(['Count'], axis=1).values
-y_test = test['Count'].values
+# np.random.seed(1234)
+# train, validate, test = np.split(df.sample(frac=1, random_state=134),
+#                                  [int(.6*len(df)), int(.8*len(df))])
+#
+# # We need to drop the count values for the training, validation, and test
+# x_train = train.drop(['Count'], axis =1).values
+# y_train = train['Count'].values
+#
+# x_val = train.drop(['Count'], axis=1).values
+# y_val = train['Count'].values
+#
+# x_test = test.drop(['Count'], axis=1).values
+# y_test = test['Count'].values
 
 # creating the neural net
 torch.manual_seed(1234)
@@ -48,7 +47,8 @@ class model(nn.Module):
         self.fc4 = nn.Linear(40, 80)
         self.fc5 = nn.Linear(80, 40)
         self.fc6 = nn.Linear(40, 20)
-        self.fc7 = nn.Linear(20, 11)         # Final output: predicing # of possible accidents
+        self.fc7 = nn.Linear(20, 2)
+        # Final output: predicing # of possible accidents
 
     def forward(self, x):
         out = F.relu(self.fc1(x))
@@ -86,6 +86,24 @@ with open('dictionary.pickle', 'wb') as handle:
     pickle.dump(df, handle, protocol=pickle.HIGHEST_PROTOCOL)
 with open('dictionary.pickle', 'rb') as handle:
     data = pickle.load(handle)
+np.random.seed(1234)
+
+# Converting the data to binary
+data.loc[data['Count'] >= 1.0, 'Count'] = 1.0
+
+train, validate, test = np.split(data.sample(frac=1, random_state=134),
+                                 [int(.6*len(df)), int(.8*len(df))])
+
+# We need to drop the count values for the training, validation, and test
+x_train = train.drop(['Count'], axis =1).values
+y_train = train['Count'].values
+
+x_val = train.drop(['Count'], axis=1).values
+y_val = train['Count'].values
+
+x_test = test.drop(['Count'], axis=1).values
+y_test = test['Count'].values
+
 
 # Compute the mean of each column of the tensors. Also compute the standard deviation
 # torch.mean[data, axis  =  1] data-mean/stdv
@@ -205,7 +223,7 @@ def load_model(epoch, model, path='./'):
     model.load_state_dict(torch.load(filename))
     return model
 
-numEpochs = 50
+numEpochs = 15
 checkpoint_freq = 10
 path='./'
 train_losses = []
